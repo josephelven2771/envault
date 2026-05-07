@@ -48,7 +48,12 @@ class AuditLog:
         if not os.path.exists(self.log_path):
             return []
         with open(self.log_path, "r") as f:
-            return json.load(f)
+            try:
+                return json.load(f)
+            except json.JSONDecodeError as e:
+                raise ValueError(
+                    f"Audit log at '{self.log_path}' contains invalid JSON: {e}"
+                ) from e
 
     def _save(self, entries: List[dict]) -> None:
         os.makedirs(os.path.dirname(self.log_path) or ".", exist_ok=True)
