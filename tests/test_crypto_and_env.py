@@ -35,6 +35,25 @@ def test_derive_key_length():
     assert len(key) == 32
 
 
+def test_derive_key_is_deterministic():
+    """Same password and salt should always produce the same key."""
+    import os
+    salt = os.urandom(SALT_SIZE)
+    key1 = derive_key("mypassword", salt)
+    key2 = derive_key("mypassword", salt)
+    assert key1 == key2
+
+
+def test_derive_key_differs_with_different_salt():
+    """Different salts should produce different keys for the same password."""
+    import os
+    salt1 = os.urandom(SALT_SIZE)
+    salt2 = os.urandom(SALT_SIZE)
+    key1 = derive_key("mypassword", salt1)
+    key2 = derive_key("mypassword", salt2)
+    assert key1 != key2
+
+
 # --- env_file tests ---
 
 def test_parse_env_basic():
