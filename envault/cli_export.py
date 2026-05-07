@@ -39,8 +39,12 @@ def cmd_export(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     if args.output:
-        with open(args.output, "w") as fh:
-            fh.write(output + "\n")
+        try:
+            with open(args.output, "w") as fh:
+                fh.write(output + "\n")
+        except OSError as exc:
+            print(f"Error: Could not write to '{args.output}': {exc}", file=sys.stderr)
+            sys.exit(1)
         print(f"Exported {len(env)} variable(s) to '{args.output}' ({args.format}).")
     else:
         print(output)
