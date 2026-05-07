@@ -25,6 +25,9 @@ def rotate_key(
     if not versions:
         return 0
 
+    if old_password == new_password:
+        raise ValueError("new_password must differ from old_password")
+
     rotated = 0
     for version in versions:
         entry = store.load(project, version)
