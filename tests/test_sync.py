@@ -80,3 +80,12 @@ def test_push_pull_roundtrip_preserves_all_vars(store, tmp_path):
     assert result["FOO"] == "bar"
     assert result["BAZ"] == "qux"
     assert result["EMPTY"] == ""
+
+
+def test_pull_does_not_write_file_on_wrong_password(store, env_file, tmp_path):
+    """Ensure pull does not create a destination file when decryption fails."""
+    push(PROJECT, ENV, env_file, PASSWORD, "alice@example.com", store=store)
+    dest = tmp_path / ".env.bad"
+    with pytest.raises(Exception):
+        pull(PROJECT, ENV, dest, "wrongpassword", store=store)
+    assert not dest.exists(), "Destination file should not be written when decryption fails"
