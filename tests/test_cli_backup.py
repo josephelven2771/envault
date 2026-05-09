@@ -34,6 +34,13 @@ def _seed(store: LocalStore, project: str) -> None:
     store.save(project, entry)
 
 
+def _create_backup(store: LocalStore, path: Path, notes: str = "") -> Path:
+    """Helper to create a backup archive for use in tests."""
+    from envault.env_backup import create_backup
+    create_backup(store, path, notes=notes)
+    return path
+
+
 @pytest.fixture()
 def store_dir(tmp_path: Path) -> str:
     d = tmp_path / "store"
@@ -66,12 +73,10 @@ def test_cmd_backup_notes_shown(store_dir, tmp_path, capsys):
 def test_cmd_restore_prints_summary(store_dir, tmp_path, capsys):
     store = LocalStore(store_dir)
     _seed(store, "alpha")
-    backup = str(tmp_path / "bk.zip")
-    from envault.env_backup import create_backup
-    create_backup(store, Path(backup))
+    backup = _create_backup(store, tmp_path / "bk.zip")
 
     new_dir = str(tmp_path / "new_store")
-    args = make_args(store_dir=new_dir, input=backup)
+    args = make_args(store_dir=new_dir, input=str(backup))
     cmd_restore(args)
     captured = capsys.readouterr()
     assert "Restore complete" in captured.out
@@ -86,11 +91,9 @@ def test_cmd_restore_missing_file_exits(store_dir, tmp_path):
 def test_cmd_backup_info_prints_metadata(store_dir, tmp_path, capsys):
     store = LocalStore(store_dir)
     _seed(store, "beta")
-    backup = str(tmp_path / "info.zip")
-    from envault.env_backup import create_backup
-    create_backup(store, Path(backup), notes="info test")
+    backup = _create_backup(store, tmp_path / "info.zip", notes="info test")
 
-    args = make_args(input=backup)
+    args = make_args(input=str(backup))
     cmd_backup_info(args)
     captured = capsys.readouterr()
     assert "beta" in captured.out
