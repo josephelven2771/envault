@@ -10,6 +10,17 @@ from envault.env_promote import promote
 from envault.whoami import get_current_user
 
 
+def _print_promote_result(result) -> None:
+    """Print a human-readable summary of a promote operation result."""
+    print(result.summary())
+    if result.promoted_keys:
+        print("  New keys    :", ", ".join(result.promoted_keys))
+    if result.overwritten_keys:
+        print("  Overwritten :", ", ".join(result.overwritten_keys))
+    if result.skipped_keys:
+        print("  Skipped     :", ", ".join(result.skipped_keys))
+
+
 def cmd_promote(args: argparse.Namespace) -> None:
     store = LocalStore(args.store_dir)
 
@@ -34,13 +45,7 @@ def cmd_promote(args: argparse.Namespace) -> None:
         print(f"Error: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    print(result.summary())
-    if result.promoted_keys:
-        print("  New keys    :", ", ".join(result.promoted_keys))
-    if result.overwritten_keys:
-        print("  Overwritten :", ", ".join(result.overwritten_keys))
-    if result.skipped_keys:
-        print("  Skipped     :", ", ".join(result.skipped_keys))
+    _print_promote_result(result)
 
 
 def add_promote_subcommand(subparsers: argparse._SubParsersAction) -> None:  # type: ignore[type-arg]
