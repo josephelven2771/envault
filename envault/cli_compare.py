@@ -9,6 +9,13 @@ from envault.env_compare import compare_projects
 
 
 def cmd_compare(args: argparse.Namespace) -> None:
+    """Execute the compare sub-command.
+
+    Decrypts the latest snapshot of two projects and prints a side-by-side
+    summary of their environment variable differences.  Exits with code 1 on
+    decryption/lookup errors and, when ``--exit-code`` is supplied, with
+    code 2 when at least one difference is detected.
+    """
     store = LocalStore(args.store_dir)
 
     password_b = args.password_b if args.password_b else args.password
@@ -35,6 +42,7 @@ def cmd_compare(args: argparse.Namespace) -> None:
 
 
 def add_compare_subcommand(subparsers: argparse._SubParsersAction) -> None:  # noqa: SLF001
+    """Register the *compare* sub-command on *subparsers*."""
     p = subparsers.add_parser(
         "compare",
         help="Compare the latest env of two projects side-by-side.",
