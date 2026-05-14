@@ -84,3 +84,18 @@ def test_apply_missing_keys_skipped(tmpl_store):
 def test_apply_unknown_template_raises(tmpl_store):
     with pytest.raises(KeyError, match="not found"):
         tmpl_store.apply("ghost", {"A": "1"})
+
+
+def test_apply_empty_env_returns_empty(tmpl_store):
+    """Applying a template against an empty env dict should return an empty dict."""
+    tmpl_store.set(make_template(keys=["A", "B"]))
+    filtered = tmpl_store.apply("base", {})
+    assert filtered == {}
+
+
+def test_template_with_empty_keys_list(tmpl_store):
+    """A template with no keys should always produce an empty filtered result."""
+    tmpl_store.set(Template(name="empty", keys=[]))
+    env = {"A": "1", "B": "2"}
+    filtered = tmpl_store.apply("empty", env)
+    assert filtered == {}
